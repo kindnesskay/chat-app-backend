@@ -1,19 +1,30 @@
-import express from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
-dotenv.config()
-import authRoutes from './routes/auth.routes.js'
-const port=process.env.PORT
-const app=express()
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import profileRoutes from "./routes/profile.route.js";
+import authRoutes from "./routes/auth.routes.js";
+import connectToMongoose from "./lib/connectToMongoose.js";
+import cookieParser from "cookie-parser";
+const app = express();
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+  })
+);
 app.use(express.json());
-app.use(cors())
-app.get("/",(req,res)=>{
-res.json({message:"Hello world"})
-})
+dotenv.config();
+app.use(cookieParser());
 
-app.use("/api/auth",authRoutes)
+const port = process.env.PORT;
 
-app.listen(port,()=>{
-    console.log("running on port :",port);
-})
+app.get("/", (req, res) => {
+  res.json({ message: "Hello world" });
+});
 
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.listen(port, () => {
+  connectToMongoose();
+  console.log("running on port :", port);
+});
